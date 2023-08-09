@@ -34,22 +34,23 @@ async function onListen() {
   });
 
   // Log the invite URL.
-  console.log(
-    "Invite Shorter to a server:",
-    `https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands`,
-  );
+  console.log("Invite Shorter to a server:", INVITE_URL);
 
   // Log the application information.
-  console.log(
-    "Discord application information:",
-    `https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/bot`,
-  );
+  console.log("Discord application information:", APPLICATION_URL);
 }
 
 /**
  * handle is the HTTP handler for the Shorter application command.
  */
 export async function handle(request: Request): Promise<Response> {
+  // Redirect to the invite URL on GET /invite.
+  const url = new URL(request.url);
+  if (request.method === "GET" && url.pathname === "/invite") {
+    return Response.redirect(INVITE_URL);
+  }
+
+  // Verify the request.
   const { error, body } = await verify(request, env.DISCORD_PUBLIC_KEY);
   if (error !== null) {
     return error;
@@ -155,3 +156,8 @@ export function makeShorterOptions(
     },
   };
 }
+
+const INVITE_URL =
+  `https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands`;
+const APPLICATION_URL =
+  `https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/bot`;
