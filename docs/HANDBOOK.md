@@ -17,7 +17,7 @@ The `acmcsuf.com/*` shortlinks are stored in a static JSON file
 
 ### Format
 
-> [!NOTE] The format of the JSON file is not required to be known to update
+> **Note** The format of the JSON file is not required to be known to update
 > shortlinks on `acmcsuf.com`. This section is for those who are curious.
 
 The [`acmcsuf.com`](https://acmcsuf.com/code) repository uses a formatter tool
@@ -48,11 +48,11 @@ The destination string of a shortlink may be a
 }
 ```
 
-| Destination                                | Alias       | Visit                           |
-| ------------------------------------------ | ----------- | ------------------------------- |
-| <https://github.com/acmcsufoss>            | `github`    | <https://acmcsuf.com/github>    |
-| <https://instagram.com/acmcsuf>            | `instagram` | <https://acmcsuf.com/instagram> |
-| <https://linkedin.com/company/acm-at-csuf> | `linkedin`  | <https://acmcsuf.com/linkedin>  |
+| Visit                           | Alias       | Destination                                |
+| ------------------------------- | ----------- | ------------------------------------------ |
+| <https://acmcsuf.com/github>    | `github`    | <https://github.com/acmcsufoss>            |
+| <https://acmcsuf.com/instagram> | `instagram` | <https://instagram.com/acmcsuf>            |
+| <https://acmcsuf.com/linkedin>  | `linkedin`  | <https://linkedin.com/company/acm-at-csuf> |
 
 Alternatively, the destination string may be a relative path of an existing
 shortlink alias, including URL hash or query parameters.
@@ -64,10 +64,10 @@ shortlink alias, including URL hash or query parameters.
 }
 ```
 
-| Destination                                                          | Alias                | Visit                                    | Explanation                                                               |
-| -------------------------------------------------------------------- | -------------------- | ---------------------------------------- | ------------------------------------------------------------------------- |
-| <https://github.com/acmcsufoss/shorter#readme>                       | `shorter-readme`     | <https://acmcsuf.com/shorter-readme>     | `https://github.com/acmcsufoss` + `/shorter#readme`                       |
-| <https://github.com/acmcsuf.com/shorter/pulls?q=is%3Apr+is%3Aclosed> | `shorter-closed-prs` | <https://acmcsuf.com/shorter-closed-prs> | `https://github.com/acmcsuf.com` + `/shorter/pulls?q=is%3Apr+is%3Aclosed` |
+| Visit                                    | Alias                | Destination                                                          | Explanation                                                               |
+| ---------------------------------------- | -------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| <https://acmcsuf.com/shorter-readme>     | `shorter-readme`     | <https://github.com/acmcsufoss/shorter#readme>                       | `https://github.com/acmcsufoss` + `/shorter#readme`                       |
+| <https://acmcsuf.com/shorter-closed-prs> | `shorter-closed-prs` | <https://github.com/acmcsuf.com/shorter/pulls?q=is%3Apr+is%3Aclosed> | `https://github.com/acmcsuf.com` + `/shorter/pulls?q=is%3Apr+is%3Aclosed` |
 
 Additionally, the alias string may be nested to create a hierarchy of
 shortlinks.
@@ -82,20 +82,20 @@ shortlinks.
 }
 ```
 
-| Destination                                                           | Alias        | Visit                            |
-| --------------------------------------------------------------------- | ------------ | -------------------------------- |
-| <https://discord.com/channels/710225099923521558/1016446711880745032> | `vc/ai`      | <https://acmcsuf.com/vc/ai>      |
-| <https://discord.com/channels/710225099923521558/935637646762450966>  | `vc/algo`    | <https://acmcsuf.com/vc/algo>    |
-| <https://discord.com/channels/710225099923521558/935637681373839401>  | `vc/design`  | <https://acmcsuf.com/vc/design>  |
-| <https://discord.com/channels/710225099923521558/935637701594611742>  | `vc/dev`     | <https://acmcsuf.com/vc/dev>     |
-| <https://discord.com/channels/710225099923521558/1121137782987952280> | `vc/gamedev` | <https://acmcsuf.com/vc/gamedev> |
+| Visit                            | Alias        | Destination                                                           |
+| -------------------------------- | ------------ | --------------------------------------------------------------------- |
+| <https://acmcsuf.com/vc/ai>      | `vc/ai`      | <https://discord.com/channels/710225099923521558/1016446711880745032> |
+| <https://acmcsuf.com/vc/algo>    | `vc/algo`    | <https://discord.com/channels/710225099923521558/935637646762450966>  |
+| <https://acmcsuf.com/vc/design>  | `vc/design`  | <https://discord.com/channels/710225099923521558/935637681373839401>  |
+| <https://acmcsuf.com/vc/dev>     | `vc/dev`     | <https://discord.com/channels/710225099923521558/935637701594611742>  |
+| <https://acmcsuf.com/vc/gamedev> | `vc/gamedev` | <https://discord.com/channels/710225099923521558/1121137782987952280> |
 
 ## The internal tool
 
 The internal tool is a Discord slash command named _Shorter_ that allows board
 members to update `acmcsuf.com` shortlinks with ease.
 
-> [!NOTE] > _Shorter_'s source code is located at
+> **Note** _Shorter_'s source code is located at
 > <https://oss.acmcsuf.com/shorter>!
 
 ### Security
@@ -106,8 +106,10 @@ shortlinks.
 
 ### Operate with confidence
 
-The software is a simple Discord slash command. All that is required to use the
-tool is a Discord account with the `Board Member` role on the
+The software is a simple
+[Discord slash command](https://discord.com/developers/docs/interactions/application-commands).
+All that is required to use the tool is a Discord account with the
+`Board Member` role on the
 [ACM CSUF Discord server](https://acmcsuf.com/discord).
 
 - This slash command is only available to members with the `Board Member` role.
