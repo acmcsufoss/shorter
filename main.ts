@@ -6,7 +6,7 @@
 
 import { discord } from "./deps.ts";
 import { DiscordAPIClient, verify } from "./discord/mod.ts";
-import { APP_SHORTER, SHORTER_ALIAS } from "./app/mod.ts";
+import { APP_SHORTER, SHORTER_ALIAS, SHORTER_DESTINATION } from "./app/mod.ts";
 import type { ShorterOptions } from "./shorter.ts";
 import { shorter } from "./shorter.ts";
 import * as env from "./env.ts";
@@ -139,7 +139,7 @@ export function makeShorterOptions(
   }
 
   const destinationOption = data.options
-    ?.find((option) => option.name === SHORTER_ALIAS);
+    ?.find((option) => option.name === SHORTER_DESTINATION);
   if (destinationOption?.type !== discord.ApplicationCommandOptionType.String) {
     throw new Error("Invalid destination");
   }
