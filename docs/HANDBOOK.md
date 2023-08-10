@@ -108,11 +108,10 @@ shortlinks.
 
 The software is a simple
 [Discord slash command](https://discord.com/developers/docs/interactions/application-commands).
-All that is required to use the tool is a Discord account with the
-`Board Member` role on the
-[ACM CSUF Discord server](https://acmcsuf.com/discord).
+All that is required to use the tool is a Discord account with the `Board` role
+on the [ACM CSUF Discord server](https://acmcsuf.com/discord).
 
-- This slash command is only available to members with the `Board Member` role.
+- This slash command is only available to members with the `Board` role.
 - This slash command is available in all text channels of the
   [ACM CSUF Discord server](https://acmcsuf.com/discord).
 - Type `/shorter` in any text channel to use the tool.
