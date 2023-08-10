@@ -20,7 +20,7 @@ export async function shorter(options: ShorterOptions): Promise<ShorterResult> {
         message,
         tree: tree.sha,
       }), (commit) => commit.parentRef(ACMCSUF_MAIN_BRANCH))
-      .createOrUpdateBranch(({ 1: commit }) => ({
+      .updateBranch(({ 1: commit }) => ({
         ref: ACMCSUF_MAIN_BRANCH,
         sha: commit.sha,
       })), {
