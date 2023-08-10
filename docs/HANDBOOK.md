@@ -17,8 +17,10 @@ The `acmcsuf.com/*` shortlinks are stored in a static JSON file
 
 ### Format
 
-> **Note** The format of the JSON file is not required to be known to update
-> shortlinks on `acmcsuf.com`. This section is for those who are curious.
+> **NOTE**
+>
+> The format of the JSON file is not required to be known to update shortlinks
+> on `acmcsuf.com`. This section is for those who are curious.
 
 The [`acmcsuf.com`](https://acmcsuf.com/code) repository uses a formatter tool
 named Prettier to format the JSON file. The formatter is configured in a file
@@ -95,8 +97,9 @@ shortlinks.
 The internal tool is a Discord slash command named _Shorter_ that allows board
 members to update `acmcsuf.com` shortlinks with ease.
 
-> **Note** _Shorter_'s source code is located at
-> <https://oss.acmcsuf.com/shorter>!
+> **NOTE**
+>
+> _Shorter_'s source code is located at <https://oss.acmcsuf.com/shorter>!
 
 ### Security
 
