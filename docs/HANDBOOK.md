@@ -103,9 +103,8 @@ members to update `acmcsuf.com` shortlinks with ease.
 
 ### Security
 
-This tool leverages Discord's permissions system to elevate the
-security of the `acmcsuf.com` repository, allowing only board members to update
-shortlinks.
+This tool leverages Discord's permissions system to elevate the security of the
+`acmcsuf.com` repository, allowing only board members to update shortlinks.
 
 ### Operate with confidence
 
