@@ -12,6 +12,13 @@ export async function shorter(options: ShorterOptions): Promise<ShorterResult> {
           .baseRef(ACMCSUF_MAIN_BRANCH)
           .text(ACMCSUF_LINKS_PATH, (text) => {
             const data = JSON.parse(text);
+            const isAliasTaken = data[options.data.alias] !== undefined;
+            if (isAliasTaken) {
+              throw new Error(
+                `the alias \`${options.data.alias}\` already exists`,
+              );
+            }
+
             data[options.data.alias] = options.data.destination;
             return JSON.stringify(data, null, 2) + "\n";
           })

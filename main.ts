@@ -103,7 +103,7 @@ export async function handle(request: Request): Promise<Response> {
               botID: env.DISCORD_CLIENT_ID,
               botToken: env.DISCORD_TOKEN,
               interactionToken: interaction.token,
-              content: error.message,
+              content: `Error: ${error.message}`,
             });
           }
 
