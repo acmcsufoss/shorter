@@ -24,7 +24,7 @@ export async function shorter(options: ShorterOptions): Promise<ShorterResult> {
             } else {
               data[options.data.alias] = options.data.destination;
             }
-            
+
             return JSON.stringify(data, null, 2) + "\n";
           })
       )
@@ -83,7 +83,7 @@ export interface ShorterOptions {
 
     /**
      * destination is the destination location.
-     * 
+     *
      * If destination is not provided, the alias will be removed.
      */
     destination?: string;
