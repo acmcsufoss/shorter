@@ -11,6 +11,10 @@ export const SHORTER_DESTINATION = "destination";
 export const SHORTER_DESTINATION_DESCRIPTION =
   "The destination of the shortlink.";
 
+export const SHORTER_FORCE = "force";
+export const SHORTER_FORCE_DESCRIPTION =
+  "Whether to overwrite an existing shortlink.";
+
 /**
  * APP_SHORTER is the top-level command for the Shorter Application Command.
  */
@@ -30,6 +34,12 @@ export const APP_SHORTER: discord.RESTPostAPIApplicationCommandsJSONBody = {
       name: SHORTER_DESTINATION,
       description: SHORTER_DESTINATION_DESCRIPTION,
       required: true,
+    },
+    {
+      type: discord.ApplicationCommandOptionType.Boolean,
+      name: SHORTER_FORCE,
+      description: SHORTER_FORCE_DESCRIPTION,
+      required: false,
     },
   ],
 };
