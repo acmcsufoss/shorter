@@ -133,8 +133,11 @@ export function makeHandler(kv: Deno.Kv) {
             let content =
               `Created commit [${result.message}](https://acmcsuf.com/code/commit/${result.sha})!`;
             if (ttlDuration) {
+              // Render to Discord timestamp format.
+              // https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa
+              const discordTimestamp = `<t:${Date.now() + ttlDuration.raw}:R>`;
               content +=
-                `\n\nThis shortlink will be expire in ${ttlDuration.toShortString()}.`;
+                `\n\nThis shortlink will be expire in ${discordTimestamp}.`;
             }
 
             // Send the success message.
