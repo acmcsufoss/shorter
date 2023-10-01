@@ -1,30 +1,31 @@
-// Run:
-// deno task start
-//
-// deno task ngrok
-//
-
 import { discord, Duration } from "shorter/deps.ts";
 import { DiscordAPIClient, verify } from "shorter/lib/discord/mod.ts";
-import {
-  APP_SHORTER,
-  SHORTER_ALIAS,
-  SHORTER_DESTINATION,
-  SHORTER_FORCE,
-  SHORTER_TTL,
-} from "shorter/app/mod.ts";
 import type { ShorterOptions } from "shorter/lib/shorter/mod.ts";
 import { shorter } from "shorter/lib/shorter/mod.ts";
 import {
   addTTLMessage,
   makeTTLMessageListener,
 } from "shorter/lib/queues/mod.ts";
-import * as env from "shorter/env.ts";
+import {
+  APP_SHORTER,
+  SHORTER_ALIAS,
+  SHORTER_DESTINATION,
+  SHORTER_FORCE,
+  SHORTER_TTL,
+} from "shorter/app.ts";
+import {
+  DISCORD_CLIENT_ID,
+  DISCORD_PUBLIC_KEY,
+  DISCORD_ROLE_ID,
+  DISCORD_TOKEN,
+  GITHUB_TOKEN,
+  PORT,
+} from "shorter/env.ts";
 
 const INVITE_URL =
-  `https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands`;
+  `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&scope=applications.commands`;
 const APPLICATION_URL =
-  `https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/bot`;
+  `https://discord.com/developers/applications/${DISCORD_CLIENT_ID}/bot`;
 
 const discordAPI = new DiscordAPIClient();
 
@@ -38,11 +39,11 @@ if (import.meta.main) {
 export async function main() {
   // Set up queue listener.
   const kv = await Deno.openKv();
-  kv.listenQueue(makeTTLMessageListener(env.GITHUB_TOKEN));
+  kv.listenQueue(makeTTLMessageListener(GITHUB_TOKEN));
 
   // Start the server.
   Deno.serve(
-    { port: env.PORT, onListen },
+    { port: PORT, onListen },
     makeHandler(kv),
   );
 }
@@ -51,8 +52,8 @@ async function onListen() {
   // Overwrite the Discord Application Command.
   await discordAPI.registerCommand({
     app: APP_SHORTER,
-    botID: env.DISCORD_CLIENT_ID,
-    botToken: env.DISCORD_TOKEN,
+    botID: DISCORD_CLIENT_ID,
+    botToken: DISCORD_TOKEN,
   });
 
   // Log the invite URL.
@@ -77,7 +78,7 @@ export function makeHandler(kv: Deno.Kv) {
     }
 
     // Verify the request.
-    const { error, body } = await verify(request, env.DISCORD_PUBLIC_KEY);
+    const { error, body } = await verify(request, DISCORD_PUBLIC_KEY);
     if (error !== null) {
       return error;
     }
@@ -101,7 +102,7 @@ export function makeHandler(kv: Deno.Kv) {
         }
 
         if (
-          !interaction.member.roles.some((role) => env.DISCORD_ROLE_ID === role)
+          !interaction.member.roles.some((role) => DISCORD_ROLE_ID === role)
         ) {
           return new Response("Invalid request", { status: 400 });
         }
@@ -143,8 +144,8 @@ export function makeHandler(kv: Deno.Kv) {
 
             // Send the success message.
             await discordAPI.editOriginalInteractionResponse({
-              botID: env.DISCORD_CLIENT_ID,
-              botToken: env.DISCORD_TOKEN,
+              botID: DISCORD_CLIENT_ID,
+              botToken: DISCORD_TOKEN,
               interactionToken: interaction.token,
               content,
             });
@@ -163,8 +164,8 @@ export function makeHandler(kv: Deno.Kv) {
           .catch((error) => {
             if (error instanceof Error) {
               discordAPI.editOriginalInteractionResponse({
-                botID: env.DISCORD_CLIENT_ID,
-                botToken: env.DISCORD_TOKEN,
+                botID: DISCORD_CLIENT_ID,
+                botToken: DISCORD_TOKEN,
                 interactionToken: interaction.token,
                 content: `Error: ${error.message}`,
               });
@@ -218,7 +219,7 @@ export function makeShorterOptions(
   }
 
   return {
-    githubPAT: env.GITHUB_TOKEN,
+    githubPAT: GITHUB_TOKEN,
     actor: {
       tag: member.user.username,
       nick: member.nick || undefined,
