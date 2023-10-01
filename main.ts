@@ -135,9 +135,10 @@ export function makeHandler(kv: Deno.Kv) {
             if (ttlDuration) {
               // Render to Discord timestamp format.
               // https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa
-              const discordTimestamp = `<t:${Date.now() + ttlDuration.raw}:R>`;
-              content +=
-                `\n\nThis shortlink will be expire in ${discordTimestamp}.`;
+              const discordTimestamp = toDiscordTimestamp(
+                (Date.now() + ttlDuration.raw) * 0.001,
+              );
+              content += `\n\nThis shortlink will expire ${discordTimestamp}.`;
             }
 
             // Send the success message.
@@ -228,4 +229,8 @@ export function makeShorterOptions(
       force: forceOption?.value,
     },
   };
+}
+
+function toDiscordTimestamp(timestamp: number) {
+  return `<t:${~~timestamp}:R>`;
 }
