@@ -118,17 +118,16 @@ export function makeHandler(kv: Deno.Kv) {
             // Get the TTL option.
             const ttlOption = interaction.data.options
               ?.find((option) => option.name === SHORTER_TTL);
-            let ttlDuration: Duration | undefined;
-            if (ttlOption) {
-              if (
-                ttlOption.type !== discord.ApplicationCommandOptionType.String
-              ) {
-                throw new Error("Invalid TTL");
-              }
-
-              // Parse the TTL.
-              ttlDuration = Duration.fromString(ttlOption.value);
+            if (
+              ttlOption &&
+              ttlOption.type !== discord.ApplicationCommandOptionType.String
+            ) {
+              throw new Error("Invalid TTL");
             }
+
+            // Parse the TTL duration.
+            const ttlDuration = ttlOption &&
+              Duration.fromString(ttlOption.value);
 
             // Compose the commit message.
             let content =
@@ -207,7 +206,10 @@ export function makeShorterOptions(
 
   const forceOption = data.options
     ?.find((option) => option.name === SHORTER_FORCE);
-  if (forceOption?.type !== discord.ApplicationCommandOptionType.Boolean) {
+  if (
+    forceOption &&
+    forceOption.type !== discord.ApplicationCommandOptionType.Boolean
+  ) {
     throw new Error("Invalid force");
   }
 
@@ -220,7 +222,7 @@ export function makeShorterOptions(
     data: {
       alias: aliasOption.value,
       destination: destinationOption.value,
-      force: forceOption.value,
+      force: forceOption?.value,
     },
   };
 }
