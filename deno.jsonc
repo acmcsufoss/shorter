@@ -6,5 +6,8 @@
     "all": "deno task udd && deno lint && deno fmt",
     "start": "deno run -A main.ts",
     "ngrok": "ngrok http 8080"
+  },
+  "imports": {
+    "shorter/": "./"
   }
 }

@@ -1,4 +1,4 @@
-import { createCodemod } from "./deps.ts";
+import { createCodemod } from "shorter/deps.ts";
 
 /**
  * shorter executes the code modification to shorten a URL.
@@ -19,7 +19,12 @@ export async function shorter(options: ShorterOptions): Promise<ShorterResult> {
               );
             }
 
-            data[options.data.alias] = options.data.destination;
+            if (options.data.destination === undefined) {
+              delete data[options.data.alias];
+            } else {
+              data[options.data.alias] = options.data.destination;
+            }
+
             return JSON.stringify(data, null, 2) + "\n";
           })
       )
@@ -78,8 +83,10 @@ export interface ShorterOptions {
 
     /**
      * destination is the destination location.
+     *
+     * If destination is not provided, the alias will be removed.
      */
-    destination: string;
+    destination?: string;
 
     /**
      * force is whether to overwrite an existing shortlink.
@@ -101,15 +108,6 @@ export interface ShorterResult {
    * message is the commit message.
    */
   message: string;
-}
-
-/**
- * ShorterError is an error that occurs during shortening.
- */
-export class ShorterError extends Error {
-  public constructor(message: string) {
-    super(message);
-  }
 }
 
 function formatCommitMessage(options: ShorterOptions): string {

@@ -1,4 +1,4 @@
-import { dotenv } from "./deps.ts";
+import { dotenv } from "shorter/deps.ts";
 
 await dotenv.load({ export: true });
 

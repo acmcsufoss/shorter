@@ -1,4 +1,4 @@
-import type { discord } from "../deps.ts";
+import type { discord } from "shorter/deps.ts";
 
 /**
  * DiscordAPIClientInterface is the interface for the Discord API Client.

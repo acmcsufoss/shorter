@@ -5,6 +5,11 @@ import type {
 } from "./discord_api_client_interface.ts";
 
 /**
+ * DISCORD_API_URL is the base URL for the Discord API.
+ */
+export const DISCORD_API_URL = "https://discord.com/api/v10";
+
+/**
  * DiscordAPIClient is a client for the Discord API.
  */
 export class DiscordAPIClient implements DiscordAPIClientInterface {
@@ -74,8 +79,3 @@ export function makeEditOriginalInteractionResponseURL(
 ) {
   return `${base}/webhooks/${clientID}/${interactionToken}/messages/@original`;
 }
-
-/**
- * DISCORD_API_URL is the base URL for the Discord API.
- */
-export const DISCORD_API_URL = "https://discord.com/api/v10";

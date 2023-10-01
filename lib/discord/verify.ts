@@ -1,4 +1,4 @@
-import { nacl } from "../deps.ts";
+import { nacl } from "shorter/deps.ts";
 
 /**
  * verify verifies whether the request is coming from Discord.
