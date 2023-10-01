@@ -13,7 +13,7 @@ export async function shorter(options: ShorterOptions): Promise<ShorterResult> {
           .text(ACMCSUF_LINKS_PATH, (text) => {
             const data = JSON.parse(text);
             const isAliasTaken = data[options.data.alias] !== undefined;
-            if (isAliasTaken) {
+            if (!options.data.force && isAliasTaken) {
               throw new Error(
                 `the alias \`${options.data.alias}\` already exists`,
               );
@@ -87,6 +87,11 @@ export interface ShorterOptions {
      * If destination is not provided, the alias will be removed.
      */
     destination?: string;
+
+    /**
+     * force is whether to overwrite an existing shortlink.
+     */
+    force?: boolean;
   };
 }
 

@@ -11,6 +11,10 @@ export const SHORTER_DESTINATION = "destination";
 export const SHORTER_DESTINATION_DESCRIPTION =
   "The destination of the shortlink.";
 
+export const SHORTER_FORCE = "force";
+export const SHORTER_FORCE_DESCRIPTION =
+  "Whether to overwrite an existing shortlink.";
+
 export const SHORTER_TTL = "ttl";
 export const SHORTER_TTL_DESCRIPTION =
   "The time-to-live of the shortlink (e.g. `1d`, `1w`, `1m`, `1y`, etc.).";
@@ -36,9 +40,15 @@ export const APP_SHORTER: discord.RESTPostAPIApplicationCommandsJSONBody = {
       required: true,
     },
     {
+      // HEAD
       type: discord.ApplicationCommandOptionType.String,
       name: SHORTER_TTL,
       description: SHORTER_TTL_DESCRIPTION,
-    },
+      //
+      type: discord.ApplicationCommandOptionType.Boolean,
+      name: SHORTER_FORCE,
+      description: SHORTER_FORCE_DESCRIPTION,
+      required: false,
+    }, //main
   ],
 };
