@@ -4,21 +4,29 @@
 // deno task ngrok
 //
 
-import { discord, Duration } from "./deps.ts";
-import { DiscordAPIClient, verify } from "./discord/mod.ts";
+import { discord, Duration } from "shorter/deps.ts";
+import { DiscordAPIClient, verify } from "shorter/lib/discord/mod.ts";
 import {
   APP_SHORTER,
   SHORTER_ALIAS,
   SHORTER_DESTINATION,
-  SHORTER_TTL,
   SHORTER_FORCE,
-} from "./app/mod.ts";
-import type { ShorterOptions } from "./shorter.ts";
-import { shorter } from "./shorter.ts";
-import { addTTLMessage, listenToTTLChannel } from "./queue.ts";
-import * as env from "./env.ts";
+  SHORTER_TTL,
+} from "shorter/app/mod.ts";
+import type { ShorterOptions } from "shorter/lib/shorter/mod.ts";
+import { shorter } from "shorter/lib/shorter/mod.ts";
+import {
+  addTTLMessage,
+  makeTTLMessageListener,
+} from "shorter/lib/queues/mod.ts";
+import * as env from "shorter/env.ts";
 
-const api = new DiscordAPIClient();
+const INVITE_URL =
+  `https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands`;
+const APPLICATION_URL =
+  `https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/bot`;
+
+const discordAPI = new DiscordAPIClient();
 
 if (import.meta.main) {
   await main();
@@ -30,7 +38,7 @@ if (import.meta.main) {
 export async function main() {
   // Set up queue listener.
   const kv = await Deno.openKv();
-  kv.listenQueue(listenToTTLChannel);
+  kv.listenQueue(makeTTLMessageListener(env.GITHUB_TOKEN));
 
   // Start the server.
   Deno.serve(
@@ -41,7 +49,7 @@ export async function main() {
 
 async function onListen() {
   // Overwrite the Discord Application Command.
-  await api.registerCommand({
+  await discordAPI.registerCommand({
     app: APP_SHORTER,
     botID: env.DISCORD_CLIENT_ID,
     botToken: env.DISCORD_TOKEN,
@@ -108,7 +116,7 @@ export function makeHandler(kv: Deno.Kv) {
         shorter(options)
           .then(async (result) => {
             // Send the success message.
-            await api.editOriginalInteractionResponse({
+            await discordAPI.editOriginalInteractionResponse({
               botID: env.DISCORD_CLIENT_ID,
               botToken: env.DISCORD_TOKEN,
               interactionToken: interaction.token,
@@ -138,7 +146,7 @@ export function makeHandler(kv: Deno.Kv) {
           })
           .catch((error) => {
             if (error instanceof Error) {
-              api.editOriginalInteractionResponse({
+              discordAPI.editOriginalInteractionResponse({
                 botID: env.DISCORD_CLIENT_ID,
                 botToken: env.DISCORD_TOKEN,
                 interactionToken: interaction.token,
@@ -203,8 +211,3 @@ export function makeShorterOptions(
     },
   };
 }
-
-const INVITE_URL =
-  `https://discord.com/api/oauth2/authorize?client_id=${env.DISCORD_CLIENT_ID}&scope=applications.commands`;
-const APPLICATION_URL =
-  `https://discord.com/developers/applications/${env.DISCORD_CLIENT_ID}/bot`;

@@ -1,4 +1,4 @@
-import { discord } from "../deps.ts";
+import { discord } from "shorter/deps.ts";
 
 export const SHORTER = "shorter";
 export const SHORTER_DESCRIPTION = "Manage acmcsuf.com shortlinks.";
@@ -40,15 +40,14 @@ export const APP_SHORTER: discord.RESTPostAPIApplicationCommandsJSONBody = {
       required: true,
     },
     {
-      // HEAD
-      type: discord.ApplicationCommandOptionType.String,
-      name: SHORTER_TTL,
-      description: SHORTER_TTL_DESCRIPTION,
-      //
       type: discord.ApplicationCommandOptionType.Boolean,
       name: SHORTER_FORCE,
       description: SHORTER_FORCE_DESCRIPTION,
-      required: false,
-    }, //main
+    },
+    {
+      type: discord.ApplicationCommandOptionType.String,
+      name: SHORTER_TTL,
+      description: SHORTER_TTL_DESCRIPTION,
+    },
   ],
 };
