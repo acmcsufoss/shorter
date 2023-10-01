@@ -115,18 +115,10 @@ export function makeHandler(kv: Deno.Kv) {
         // Invoke the Shorter operation.
         shorter(options)
           .then(async (result) => {
-            // Send the success message.
-            await discordAPI.editOriginalInteractionResponse({
-              botID: env.DISCORD_CLIENT_ID,
-              botToken: env.DISCORD_TOKEN,
-              interactionToken: interaction.token,
-              content:
-                `Created commit [${result.message}](https://acmcsuf.com/code/commit/${result.sha})!`,
-            });
-
             // Get the TTL option.
             const ttlOption = interaction.data.options
               ?.find((option) => option.name === SHORTER_TTL);
+            let ttlDuration: Duration | undefined;
             if (ttlOption) {
               if (
                 ttlOption.type !== discord.ApplicationCommandOptionType.String
@@ -134,15 +126,35 @@ export function makeHandler(kv: Deno.Kv) {
                 throw new Error("Invalid TTL");
               }
 
-              // Parse the TTL in milliseconds.
-              const ttlDuration = Duration.fromString(ttlOption.value).raw;
-
-              // Enqueue the delete operation.
-              await addTTLMessage(kv, {
-                alias: options.data.alias,
-                actor: options.actor,
-              }, ttlDuration);
+              // Parse the TTL.
+              ttlDuration = Duration.fromString(ttlOption.value);
             }
+
+            // Compose the commit message.
+            let content =
+              `Created commit [${result.message}](https://acmcsuf.com/code/commit/${result.sha})!`;
+            if (ttlDuration) {
+              content +=
+                `\n\nThis shortlink will be expire in ${ttlDuration.toShortString()}.`;
+            }
+
+            // Send the success message.
+            await discordAPI.editOriginalInteractionResponse({
+              botID: env.DISCORD_CLIENT_ID,
+              botToken: env.DISCORD_TOKEN,
+              interactionToken: interaction.token,
+              content,
+            });
+
+            // Enqueue the delete operation if TTL is set.
+            if (!ttlDuration) {
+              return;
+            }
+
+            await addTTLMessage(kv, {
+              alias: options.data.alias,
+              actor: options.actor,
+            }, ttlDuration.raw);
           })
           .catch((error) => {
             if (error instanceof Error) {
