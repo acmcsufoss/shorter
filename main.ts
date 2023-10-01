@@ -151,10 +151,11 @@ export function makeHandler(kv: Deno.Kv) {
               return;
             }
 
-            await addTTLMessage(kv, {
-              alias: options.data.alias,
-              actor: options.actor,
-            }, ttlDuration.raw);
+            await addTTLMessage(
+              kv,
+              { alias: options.data.alias, actor: options.actor },
+              ttlDuration.raw,
+            );
           })
           .catch((error) => {
             if (error instanceof Error) {

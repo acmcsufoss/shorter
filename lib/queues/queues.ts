@@ -50,6 +50,9 @@ export function makeTTLMessageListener(
 
 /**
  * addTTLMessage adds a TTL message to the TTL channel.
+ *
+ * See:
+ * https://docs.deno.com/kv/manual/queue_overview#queues-on-deno-deploy
  */
 export async function addTTLMessage(
   kv: Deno.Kv,
