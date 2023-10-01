@@ -6,7 +6,12 @@
 
 import { discord } from "./deps.ts";
 import { DiscordAPIClient, verify } from "./discord/mod.ts";
-import { APP_SHORTER, SHORTER_ALIAS, SHORTER_DESTINATION } from "./app/mod.ts";
+import {
+  APP_SHORTER,
+  SHORTER_ALIAS,
+  SHORTER_DESTINATION,
+  SHORTER_FORCE,
+} from "./app/mod.ts";
 import type { ShorterOptions } from "./shorter.ts";
 import { shorter } from "./shorter.ts";
 import * as env from "./env.ts";
@@ -144,6 +149,12 @@ export function makeShorterOptions(
     throw new Error("Invalid destination");
   }
 
+  const forceOption = data.options
+    ?.find((option) => option.name === SHORTER_FORCE);
+  if (forceOption?.type !== discord.ApplicationCommandOptionType.Boolean) {
+    throw new Error("Invalid force");
+  }
+
   return {
     githubPAT: env.GITHUB_TOKEN,
     actor: {
@@ -153,6 +164,7 @@ export function makeShorterOptions(
     data: {
       alias: aliasOption.value,
       destination: destinationOption.value,
+      force: forceOption.value,
     },
   };
 }
