@@ -13,13 +13,14 @@ export async function shorter(options: ShorterOptions): Promise<ShorterResult> {
           .text(ACMCSUF_LINKS_PATH, (text) => {
             const data = JSON.parse(text);
             const isAliasTaken = data[options.data.alias] !== undefined;
-            if (!options.data.force && isAliasTaken) {
+            const isAliasToBeRemoved = options.data.destination === undefined;
+            if (!isAliasToBeRemoved && !options.data.force && isAliasTaken) {
               throw new Error(
                 `the alias \`${options.data.alias}\` already exists`,
               );
             }
 
-            if (options.data.destination === undefined) {
+            if (isAliasToBeRemoved) {
               delete data[options.data.alias];
             } else {
               data[options.data.alias] = options.data.destination;
