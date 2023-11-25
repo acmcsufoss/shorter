@@ -14,6 +14,7 @@ import {
   GITHUB_TOKEN,
   PORT,
 } from "shorter/env.ts";
+import { appSchema } from "shorter/app.ts";
 
 const INVITE_URL =
   `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&scope=applications.commands`;
@@ -43,32 +44,7 @@ export async function main() {
       applicationID: DISCORD_CLIENT_ID,
       publicKey: DISCORD_PUBLIC_KEY,
       token: DISCORD_TOKEN,
-      schema: {
-        chatInput: {
-          name: "shorter",
-          description: "Shorten a URL",
-          options: {
-            alias: {
-              type: discord.ApplicationCommandOptionType.String,
-              description: "The alias of the shortlink",
-              required: true,
-            },
-            destination: {
-              type: discord.ApplicationCommandOptionType.String,
-              description: "The destination of the shortlink",
-              required: true,
-            },
-            force: {
-              type: discord.ApplicationCommandOptionType.Boolean,
-              description: "Whether to overwrite an existing shortlink",
-            },
-            ttl: {
-              type: discord.ApplicationCommandOptionType.String,
-              description: "The time-to-live of the shortlink",
-            },
-          },
-        },
-      },
+      schema: appSchema,
     },
     (interaction) => {
       if (!interaction.member?.user) {
