@@ -1,18 +1,11 @@
-import { discord, Duration } from "shorter/deps.ts";
-import { DiscordAPIClient, verify } from "shorter/lib/discord/mod.ts";
+import { createApp, discord, Duration } from "shorter/deps.ts";
 import type { ShorterOptions } from "shorter/lib/shorter/mod.ts";
 import { shorter } from "shorter/lib/shorter/mod.ts";
+import { DiscordAPIClient } from "shorter/lib/discord/mod.ts";
 import {
   addTTLMessage,
   makeTTLMessageListener,
 } from "shorter/lib/queues/mod.ts";
-import {
-  APP_SHORTER,
-  SHORTER_ALIAS,
-  SHORTER_DESTINATION,
-  SHORTER_FORCE,
-  SHORTER_TTL,
-} from "shorter/app.ts";
 import {
   DISCORD_CLIENT_ID,
   DISCORD_PUBLIC_KEY,
@@ -39,199 +32,145 @@ if (import.meta.main) {
 export async function main() {
   // Set up queue listener.
   const kv = await Deno.openKv();
-  kv.listenQueue(makeTTLMessageListener(GITHUB_TOKEN));
-
-  // Start the server.
-  Deno.serve(
-    { port: PORT, onListen },
-    makeHandler(kv),
-  );
-}
-
-async function onListen() {
-  // Overwrite the Discord Application Command.
-  await discordAPI.registerCommand({
-    app: APP_SHORTER,
-    botID: DISCORD_CLIENT_ID,
-    botToken: DISCORD_TOKEN,
+  const ttlMessageListener = makeTTLMessageListener(GITHUB_TOKEN);
+  kv.listenQueue(async (message) => {
+    await ttlMessageListener(message);
   });
 
-  // Log the invite URL.
-  console.log("Invite Shorter to a server:", INVITE_URL);
-
-  // Log the application information.
-  console.log("Discord application information:", APPLICATION_URL);
-}
-
-/**
- * makeHandler makes the HTTP handler for the Shorter application command.
- */
-export function makeHandler(kv: Deno.Kv) {
-  /**
-   * handle is the HTTP handler for the Shorter application command.
-   */
-  return async function handle(request: Request): Promise<Response> {
-    // Redirect to the invite URL on GET /invite.
-    const url = new URL(request.url);
-    if (request.method === "GET" && url.pathname === "/invite") {
-      return Response.redirect(INVITE_URL);
-    }
-
-    // Verify the request.
-    const { error, body } = await verify(request, DISCORD_PUBLIC_KEY);
-    if (error !== null) {
-      return error;
-    }
-
-    // Parse the incoming request as JSON.
-    const interaction = await JSON.parse(body) as discord.APIInteraction;
-    switch (interaction.type) {
-      case discord.InteractionType.Ping: {
-        return Response.json({ type: discord.InteractionResponseType.Pong });
+  // Create the Discord application.
+  const handleInteraction = await createApp(
+    {
+      applicationID: DISCORD_CLIENT_ID,
+      publicKey: DISCORD_PUBLIC_KEY,
+      token: DISCORD_TOKEN,
+      schema: {
+        chatInput: {
+          name: "shorter",
+          description: "Shorten a URL",
+          options: {
+            alias: {
+              type: discord.ApplicationCommandOptionType.String,
+              description: "The alias of the shortlink",
+              required: true,
+            },
+            destination: {
+              type: discord.ApplicationCommandOptionType.String,
+              description: "The destination of the shortlink",
+              required: true,
+            },
+            force: {
+              type: discord.ApplicationCommandOptionType.Boolean,
+              description: "Whether to overwrite an existing shortlink",
+            },
+            ttl: {
+              type: discord.ApplicationCommandOptionType.String,
+              description: "The time-to-live of the shortlink",
+            },
+          },
+        },
+      },
+    },
+    (interaction) => {
+      if (!interaction.member?.user) {
+        throw new Error("Invalid request");
       }
 
-      case discord.InteractionType.ApplicationCommand: {
-        if (
-          !discord.Utils.isChatInputApplicationCommandInteraction(interaction)
-        ) {
-          return new Response("Invalid request", { status: 400 });
-        }
+      if (
+        !interaction.member.roles.some((role) => DISCORD_ROLE_ID === role)
+      ) {
+        throw new Error("Invalid request");
+      }
 
-        if (!interaction.member?.user) {
-          return new Response("Invalid request", { status: 400 });
-        }
+      // Make shorter options.
+      const shorterOptions: ShorterOptions = {
+        githubPAT: GITHUB_TOKEN,
+        actor: {
+          tag: interaction.member.user.username,
+          nick: interaction.member.nick || undefined,
+        },
+        data: {
+          alias: interaction.data.parsedOptions.alias,
+          destination: interaction.data.parsedOptions.destination,
+          force: interaction.data.parsedOptions.force,
+        },
+      };
 
-        if (
-          !interaction.member.roles.some((role) => DISCORD_ROLE_ID === role)
-        ) {
-          return new Response("Invalid request", { status: 400 });
-        }
+      // Invoke the Shorter operation.
+      shorter(shorterOptions)
+        .then(async (result) => {
+          // Parse the TTL duration.
+          const ttlDuration = interaction.data.parsedOptions.ttl &&
+            Duration.fromString(interaction.data.parsedOptions.ttl);
 
-        // Make the Shorter options.
-        const options = makeShorterOptions(
-          interaction.member,
-          interaction.data,
-        );
+          // Compose the commit message.
+          let content =
+            `Created commit [${result.message}](https://acmcsuf.com/code/commit/${result.sha})!`;
+          if (ttlDuration) {
+            // Render to Discord timestamp format.
+            // https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa
+            const discordTimestamp = toDiscordTimestamp(
+              (Date.now() + ttlDuration.raw) * 0.001,
+            );
+            content += `\n\nThis shortlink will expire ${discordTimestamp}.`;
+          }
 
-        // Invoke the Shorter operation.
-        shorter(options)
-          .then(async (result) => {
-            // Get the TTL option.
-            const ttlOption = interaction.data.options
-              ?.find((option) => option.name === SHORTER_TTL);
-            if (
-              ttlOption &&
-              ttlOption.type !== discord.ApplicationCommandOptionType.String
-            ) {
-              throw new Error("Invalid TTL");
-            }
+          // Send the success message.
+          await discordAPI.editOriginalInteractionResponse({
+            botID: DISCORD_CLIENT_ID,
+            botToken: DISCORD_TOKEN,
+            interactionToken: interaction.token,
+            content,
+          });
 
-            // Parse the TTL duration.
-            const ttlDuration = ttlOption &&
-              Duration.fromString(ttlOption.value);
+          // Enqueue the delete operation if TTL is set.
+          if (!ttlDuration) {
+            return;
+          }
 
-            // Compose the commit message.
-            let content =
-              `Created commit [${result.message}](https://acmcsuf.com/code/commit/${result.sha})!`;
-            if (ttlDuration) {
-              // Render to Discord timestamp format.
-              // https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa
-              const discordTimestamp = toDiscordTimestamp(
-                (Date.now() + ttlDuration.raw) * 0.001,
-              );
-              content += `\n\nThis shortlink will expire ${discordTimestamp}.`;
-            }
-
-            // Send the success message.
-            await discordAPI.editOriginalInteractionResponse({
+          await addTTLMessage(
+            kv,
+            {
+              alias: shorterOptions.data.alias,
+              actor: shorterOptions.actor,
+            },
+            ttlDuration.raw,
+          );
+        })
+        .catch((error) => {
+          if (error instanceof Error) {
+            discordAPI.editOriginalInteractionResponse({
               botID: DISCORD_CLIENT_ID,
               botToken: DISCORD_TOKEN,
               interactionToken: interaction.token,
-              content,
+              content: `Error: ${error.message}`,
             });
+          }
 
-            // Enqueue the delete operation if TTL is set.
-            if (!ttlDuration) {
-              return;
-            }
+          console.error(error);
+        });
 
-            await addTTLMessage(
-              kv,
-              { alias: options.data.alias, actor: options.actor },
-              ttlDuration.raw,
-            );
-          })
-          .catch((error) => {
-            if (error instanceof Error) {
-              discordAPI.editOriginalInteractionResponse({
-                botID: DISCORD_CLIENT_ID,
-                botToken: DISCORD_TOKEN,
-                interactionToken: interaction.token,
-                content: `Error: ${error.message}`,
-              });
-            }
-
-            console.error(error);
-          });
-
-        // Acknowledge the interaction.
-        return Response.json(
-          {
-            type:
-              discord.InteractionResponseType.DeferredChannelMessageWithSource,
-          } satisfies discord.APIInteractionResponseDeferredChannelMessageWithSource,
-        );
-      }
-
-      default: {
-        return new Response("Invalid request", { status: 400 });
-      }
-    }
-  };
-}
-
-/**
- * makeShorterOptions makes the Shorter options from the Discord interaction.
- */
-export function makeShorterOptions(
-  member: discord.APIInteractionGuildMember,
-  data: discord.APIChatInputApplicationCommandInteractionData,
-): ShorterOptions {
-  const aliasOption = data.options
-    ?.find((option) => option.name === SHORTER_ALIAS);
-  if (aliasOption?.type !== discord.ApplicationCommandOptionType.String) {
-    throw new Error("Invalid alias");
-  }
-
-  const destinationOption = data.options
-    ?.find((option) => option.name === SHORTER_DESTINATION);
-  if (destinationOption?.type !== discord.ApplicationCommandOptionType.String) {
-    throw new Error("Invalid destination");
-  }
-
-  const forceOption = data.options
-    ?.find((option) => option.name === SHORTER_FORCE);
-  if (
-    forceOption &&
-    forceOption.type !== discord.ApplicationCommandOptionType.Boolean
-  ) {
-    throw new Error("Invalid force");
-  }
-
-  return {
-    githubPAT: GITHUB_TOKEN,
-    actor: {
-      tag: member.user.username,
-      nick: member.nick || undefined,
+      // Acknowledge the interaction.
+      return {
+        type: discord.InteractionResponseType.DeferredChannelMessageWithSource,
+      } satisfies discord.APIInteractionResponseDeferredChannelMessageWithSource;
     },
-    data: {
-      alias: aliasOption.value,
-      destination: destinationOption.value,
-      force: forceOption?.value,
-    },
-  };
-}
+  );
 
+  // Start the server.
+  Deno.serve(
+    {
+      port: PORT,
+      onListen() {
+        // Log the invite URL.
+        console.log("Invite Shorter to a server:", INVITE_URL);
+
+        // Log the application information.
+        console.log("Discord application information:", APPLICATION_URL);
+      },
+    },
+    handleInteraction,
+  );
+}
 function toDiscordTimestamp(timestamp: number) {
   return `<t:${~~timestamp}:R>`;
 }
