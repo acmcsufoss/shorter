@@ -14,7 +14,7 @@ import {
   GITHUB_TOKEN,
   PORT,
 } from "shorter/env.ts";
-import { appSchema } from "shorter/app.ts";
+import { appSchema } from "./app_schema.ts";
 
 const INVITE_URL =
   `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&scope=applications.commands`;
@@ -43,7 +43,7 @@ export async function main() {
     {
       applicationID: DISCORD_CLIENT_ID,
       publicKey: DISCORD_PUBLIC_KEY,
-      token: DISCORD_TOKEN,
+      register: { token: DISCORD_TOKEN },
       schema: appSchema,
     },
     (interaction) => {
