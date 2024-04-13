@@ -46,89 +46,98 @@ export async function main() {
       register: { token: DISCORD_TOKEN },
       schema: appSchema,
     },
-    (interaction) => {
-      if (!interaction.member?.user) {
-        throw new Error("Invalid request");
-      }
+    {
+      add(interaction) {
+        if (!interaction.member?.user) {
+          throw new Error("Invalid request");
+        }
 
-      if (
-        !interaction.member.roles.some((role) => DISCORD_ROLE_ID === role)
-      ) {
-        throw new Error("Invalid request");
-      }
-
-      // Make shorter options.
-      const shorterOptions: ShorterOptions = {
-        githubPAT: GITHUB_TOKEN,
-        actor: {
-          tag: interaction.member.user.username,
-          nick: interaction.member.nick || undefined,
-        },
-        data: {
-          alias: interaction.data.parsedOptions.alias,
-          destination: interaction.data.parsedOptions.destination,
-          force: interaction.data.parsedOptions.force,
-        },
-      };
-
-      // Invoke the Shorter operation.
-      shorter(shorterOptions)
-        .then(async (result) => {
-          // Parse the TTL duration.
-          const ttlDuration = interaction.data.parsedOptions.ttl &&
-            Duration.fromString(interaction.data.parsedOptions.ttl);
-
-          // Compose the commit message.
-          let content =
-            `Created commit [${result.message}](https://acmcsuf.com/code/commit/${result.sha})!`;
-          if (ttlDuration) {
-            // Render to Discord timestamp format.
-            // https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa
-            const discordTimestamp = toDiscordTimestamp(
-              (Date.now() + ttlDuration.raw) * 0.001,
-            );
-            content += `\n\nThis shortlink will expire ${discordTimestamp}.`;
-          }
-
-          // Send the success message.
-          await discordAPI.editOriginalInteractionResponse({
-            botID: DISCORD_CLIENT_ID,
-            botToken: DISCORD_TOKEN,
-            interactionToken: interaction.token,
-            content,
-          });
-
-          // Enqueue the delete operation if TTL is set.
-          if (!ttlDuration) {
-            return;
-          }
-
-          await addTTLMessage(
-            kv,
-            {
-              alias: shorterOptions.data.alias,
-              actor: shorterOptions.actor,
+        if (
+          !interaction.member.roles.some((role) => DISCORD_ROLE_ID === role)
+        ) {
+          return {
+            type: discord.InteractionResponseType.ChannelMessageWithSource,
+            data: {
+              flags: discord.MessageFlags.Ephemeral,
+              content: "You do not have permission to use this command.",
             },
-            ttlDuration.raw,
-          );
-        })
-        .catch((error) => {
-          if (error instanceof Error) {
-            discordAPI.editOriginalInteractionResponse({
+          };
+        }
+
+        // Make shorter options.
+        const shorterOptions: ShorterOptions = {
+          githubPAT: GITHUB_TOKEN,
+          actor: {
+            tag: interaction.member.user.username,
+            nick: interaction.member.nick || undefined,
+          },
+          data: {
+            alias: interaction.data.parsedOptions.alias,
+            destination: interaction.data.parsedOptions.destination,
+            force: interaction.data.parsedOptions.force,
+          },
+        };
+
+        // Invoke the Shorter operation.
+        shorter(shorterOptions)
+          .then(async (result) => {
+            // Parse the TTL duration.
+            const ttlDuration = interaction.data.parsedOptions.ttl &&
+              Duration.fromString(interaction.data.parsedOptions.ttl);
+
+            // Compose the commit message.
+            let content =
+              `Created commit [${result.message}](https://acmcsuf.com/code/commit/${result.sha})!`;
+            if (ttlDuration) {
+              // Render to Discord timestamp format.
+              // https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa
+              const discordTimestamp = toDiscordTimestamp(
+                (Date.now() + ttlDuration.raw) * 0.001,
+              );
+              content += `\n\nThis shortlink will expire ${discordTimestamp}.`;
+            }
+
+            // Send the success message.
+            await discordAPI.editOriginalInteractionResponse({
               botID: DISCORD_CLIENT_ID,
               botToken: DISCORD_TOKEN,
               interactionToken: interaction.token,
-              content: `Error: ${error.message}`,
+              content,
             });
-          }
 
-          console.error(error);
-        });
+            // Enqueue the delete operation if TTL is set.
+            if (!ttlDuration) {
+              return;
+            }
 
-      // Acknowledge the interaction.
-      return {
-        type: discord.InteractionResponseType.DeferredChannelMessageWithSource,
-      } satisfies discord.APIInteractionResponseDeferredChannelMessageWithSource;
+            await addTTLMessage(
+              kv,
+              {
+                alias: shorterOptions.data.alias,
+                actor: shorterOptions.actor,
+              },
+              ttlDuration.raw,
+            );
+          })
+          .catch((error) => {
+            if (error instanceof Error) {
+              discordAPI.editOriginalInteractionResponse({
+                botID: DISCORD_CLIENT_ID,
+                botToken: DISCORD_TOKEN,
+                interactionToken: interaction.token,
+                content: `Error: ${error.message}`,
+              });
+            }
+
+            console.error(error);
+          });
+
+        // Acknowledge the interaction.
+        return {
+          type:
+            discord.InteractionResponseType.DeferredChannelMessageWithSource,
+        } satisfies discord.APIInteractionResponseDeferredChannelMessageWithSource;
+      },
     },
   );
 
@@ -147,6 +156,7 @@ export async function main() {
     handleInteraction,
   );
 }
+
 function toDiscordTimestamp(timestamp: number) {
   return `<t:${~~timestamp}:R>`;
 }
