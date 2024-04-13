@@ -116,13 +116,13 @@ on the [ACM CSUF Discord server](https://acmcsuf.com/discord).
 - This slash command is only available to members with the `Board` role.
 - This slash command is available in all text channels of the
   [ACM CSUF Discord server](https://acmcsuf.com/discord).
-- Type `/shorter` in any text channel to use the tool.
+- Type `/shorter add` in any text channel to add a new shortlink.
 - Populate both required fields `alias` and `destination` with your desired
   alias string and destination string, respectively.
 - Press <kbd>Enter</kbd> to submit the update.
 - Wait for the response from the slash command to confirm the update. This may
   take around 3 seconds.
-- Wait for redeployment to complete. This may take around 30 seconds.
+- Wait for redeployment to complete. This may take up to 60 seconds.
 
 ---
 
