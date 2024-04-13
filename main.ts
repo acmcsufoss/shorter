@@ -15,6 +15,10 @@ import {
   PORT,
 } from "shorter/env.ts";
 import { appSchema } from "./app_schema.ts";
+import {
+  AppChatInputInteractionOf,
+  Promisable,
+} from "https://deno.land/x/discord_app@0.0.4/app.ts";
 
 const INVITE_URL =
   `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&scope=applications.commands`;
@@ -118,6 +122,64 @@ export async function main() {
               },
               ttlDuration.raw,
             );
+          })
+          .catch((error) => {
+            if (error instanceof Error) {
+              discordAPI.editOriginalInteractionResponse({
+                botID: DISCORD_CLIENT_ID,
+                botToken: DISCORD_TOKEN,
+                interactionToken: interaction.token,
+                content: `Error: ${error.message}`,
+              });
+            }
+
+            console.error(error);
+          });
+
+        // Acknowledge the interaction.
+        return {
+          type:
+            discord.InteractionResponseType.DeferredChannelMessageWithSource,
+        } satisfies discord.APIInteractionResponseDeferredChannelMessageWithSource;
+      },
+      remove(interaction) {
+        if (!interaction.member?.user) {
+          throw new Error("Invalid request");
+        }
+
+        if (
+          !interaction.member.roles.some((role) => DISCORD_ROLE_ID === role)
+        ) {
+          return {
+            type: discord.InteractionResponseType.ChannelMessageWithSource,
+            data: {
+              flags: discord.MessageFlags.Ephemeral,
+              content: "You do not have permission to use this command.",
+            },
+          };
+        }
+
+        // Make shorter options.
+        const shorterOptions: ShorterOptions = {
+          githubPAT: GITHUB_TOKEN,
+          actor: {
+            tag: interaction.member.user.username,
+            nick: interaction.member.nick || undefined,
+          },
+          data: { alias: interaction.data.parsedOptions.alias },
+        };
+
+        // Invoke the Shorter operation.
+        shorter(shorterOptions)
+          .then(async (result) => {
+            // Send the success message.
+            await discordAPI.editOriginalInteractionResponse({
+              botID: DISCORD_CLIENT_ID,
+              botToken: DISCORD_TOKEN,
+              interactionToken: interaction.token,
+              content:
+                `Removed \`${interaction.data.parsedOptions.alias}\` in commit [${result.message}](https://acmcsuf.com/code/commit/${result.sha}).`,
+            });
           })
           .catch((error) => {
             if (error instanceof Error) {

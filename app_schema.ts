@@ -29,7 +29,16 @@ export const appSchema = {
           },
         },
       },
+      remove: {
+        description: "Remove a shortlink.",
+        options: {
+          alias: {
+            type: discord.ApplicationCommandOptionType.String,
+            description: "The alias of the shortlink",
+            required: true,
+          },
+        },
+      },
     },
-    // TODO: Create the "remove" subcommand.
   },
 } as const satisfies AppSchema;

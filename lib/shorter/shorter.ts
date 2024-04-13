@@ -21,6 +21,12 @@ export async function shorter(options: ShorterOptions): Promise<ShorterResult> {
             }
 
             if (isAliasToBeRemoved) {
+              if (data[options.data.alias] === undefined) {
+                throw new Error(
+                  `the alias \`${options.data.alias}\` does not exist`,
+                );
+              }
+
               delete data[options.data.alias];
             } else {
               data[options.data.alias] = options.data.destination;
