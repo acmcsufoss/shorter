@@ -15,10 +15,6 @@ import {
   PORT,
 } from "shorter/env.ts";
 import { appSchema } from "./app_schema.ts";
-import {
-  AppChatInputInteractionOf,
-  Promisable,
-} from "https://deno.land/x/discord_app@0.0.4/app.ts";
 
 const INVITE_URL =
   `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&scope=applications.commands`;
