@@ -1,5 +1,5 @@
-import * as discord from "discord-api-types";
-import type { AppSchema } from "discord-app";
+import type { AppSchema } from "@discord-applications/app";
+import { ApplicationCommandOptionType } from "@discord-applications/app";
 
 export const appSchema = {
   chatInput: {
@@ -10,21 +10,21 @@ export const appSchema = {
         description: "Add a shortlink.",
         options: {
           alias: {
-            type: discord.ApplicationCommandOptionType.String,
+            type: ApplicationCommandOptionType.String,
             description: "The alias of the shortlink",
             required: true,
           },
           destination: {
-            type: discord.ApplicationCommandOptionType.String,
+            type: ApplicationCommandOptionType.String,
             description: "The destination of the shortlink",
             required: true,
           },
           force: {
-            type: discord.ApplicationCommandOptionType.Boolean,
+            type: ApplicationCommandOptionType.Boolean,
             description: "Whether to overwrite an existing shortlink",
           },
           ttl: {
-            type: discord.ApplicationCommandOptionType.String,
+            type: ApplicationCommandOptionType.String,
             description: "The time-to-live of the shortlink",
           },
         },
@@ -33,7 +33,7 @@ export const appSchema = {
         description: "Remove a shortlink.",
         options: {
           alias: {
-            type: discord.ApplicationCommandOptionType.String,
+            type: ApplicationCommandOptionType.String,
             description: "The alias of the shortlink",
             required: true,
           },

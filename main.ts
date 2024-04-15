@@ -1,6 +1,12 @@
-import * as discord from "discord-api-types";
 import { Duration } from "durationjs";
-import { createApp } from "discord-app";
+// TODO: Export all APIInteractionResponse types from api types.
+import type { APIInteractionResponseDeferredChannelMessageWithSource } from "@discord-applications/app";
+import {
+  createApp,
+  InteractionResponseType,
+  // TODO: Export all MessageFlags from api types.
+  MessageFlags,
+} from "@discord-applications/app";
 import type { ShorterOptions } from "shorter/lib/shorter/mod.ts";
 import { shorter } from "shorter/lib/shorter/mod.ts";
 import { DiscordAPIClient } from "shorter/lib/discord/mod.ts";
@@ -23,6 +29,7 @@ const INVITE_URL =
 const APPLICATION_URL =
   `https://discord.com/developers/applications/${DISCORD_CLIENT_ID}/bot`;
 
+// TODO: Implement editOriginalInteractionResponse in DiscordAPIClient.
 const discordAPI = new DiscordAPIClient();
 
 if (import.meta.main) {
@@ -58,9 +65,9 @@ export async function main() {
           !interaction.member.roles.some((role) => DISCORD_ROLE_ID === role)
         ) {
           return {
-            type: discord.InteractionResponseType.ChannelMessageWithSource,
+            type: InteractionResponseType.ChannelMessageWithSource,
             data: {
-              flags: discord.MessageFlags.Ephemeral,
+              flags: MessageFlags.Ephemeral,
               content: "You do not have permission to use this command.",
             },
           };
@@ -136,9 +143,8 @@ export async function main() {
 
         // Acknowledge the interaction.
         return {
-          type:
-            discord.InteractionResponseType.DeferredChannelMessageWithSource,
-        } satisfies discord.APIInteractionResponseDeferredChannelMessageWithSource;
+          type: InteractionResponseType.DeferredChannelMessageWithSource,
+        } satisfies APIInteractionResponseDeferredChannelMessageWithSource;
       },
       remove(interaction) {
         if (!interaction.member?.user) {
