@@ -1,4 +1,4 @@
-import { createCodemod } from "shorter/deps.ts";
+import { createCodemod } from "codemod";
 
 /**
  * shorter executes the code modification to shorten a URL.

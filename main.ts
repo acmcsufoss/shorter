@@ -1,4 +1,6 @@
-import { createApp, discord, Duration } from "shorter/deps.ts";
+import * as discord from "discord-api-types";
+import { Duration } from "durationjs";
+import { createApp } from "discord-app";
 import type { ShorterOptions } from "shorter/lib/shorter/mod.ts";
 import { shorter } from "shorter/lib/shorter/mod.ts";
 import { DiscordAPIClient } from "shorter/lib/discord/mod.ts";

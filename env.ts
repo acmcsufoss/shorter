@@ -1,6 +1,6 @@
-import { dotenv } from "shorter/deps.ts";
+import { load } from "@std/dotenv";
 
-await dotenv.load({ export: true });
+await load({ export: true });
 
 /**
  * PORT is the port to listen on.
