@@ -1,13 +1,15 @@
 {
-  "lock": "./deno.lock",
   "tasks": {
-    "udd": "deno run -r --allow-read=. --allow-write=. --allow-net https://deno.land/x/udd/main.ts deps.ts && deno task lock",
-    "lock": "deno cache --lock=deno.lock --lock-write deps.ts",
-    "all": "deno task udd && deno lint && deno fmt",
     "start": "deno run -A --unstable-kv main.ts",
     "ngrok": "ngrok http 8080"
   },
   "imports": {
+    "discord-api-types": "https://deno.land/x/discord_api_types@0.37.79/v10.ts",
+    "codemod": "https://deno.land/x/codemod@0.0.5/github/mod.ts",
+    "durationjs": "https://deno.land/x/durationjs@v4.1.1/mod.ts",
+    "discord-app": "https://deno.land/x/discord_app@0.0.4/mod.ts",
+    "tweetnacl": "npm:tweetnacl@1.0.3",
+    "@std/dotenv": "jsr:@std/dotenv@^0.222.1",
     "shorter/": "./"
   }
 }

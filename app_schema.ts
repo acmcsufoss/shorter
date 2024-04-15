@@ -1,5 +1,5 @@
-import { discord } from "shorter/deps.ts";
-import type { AppSchema } from "shorter/deps.ts";
+import * as discord from "discord-api-types";
+import type { AppSchema } from "discord-app";
 
 export const appSchema = {
   chatInput: {
