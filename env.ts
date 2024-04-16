@@ -1,7 +1,3 @@
-import { load } from "@std/dotenv";
-
-await load({ export: true });
-
 /**
  * PORT is the port to listen on.
  */
