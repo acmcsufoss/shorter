@@ -1,5 +1,5 @@
-import type { ShorterOptions } from "shorter/lib/shorter/mod.ts";
-import { shorter } from "shorter/lib/shorter/mod.ts";
+import type { ShorterOptions } from "#/lib/shorter/mod.ts";
+import { shorter } from "#/lib/shorter/mod.ts";
 
 /**
  * TTLMessage is a message received from the TTL channel.

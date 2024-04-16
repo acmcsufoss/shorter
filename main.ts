@@ -10,12 +10,9 @@ import {
   InteractionResponseType,
   MessageFlags,
 } from "@discord-applications/app";
-import type { ShorterOptions } from "shorter/lib/shorter/mod.ts";
-import { shorter } from "shorter/lib/shorter/mod.ts";
-import {
-  addTTLMessage,
-  makeTTLMessageListener,
-} from "shorter/lib/queues/mod.ts";
+import type { ShorterOptions } from "#/lib/shorter/mod.ts";
+import { shorter } from "#/lib/shorter/mod.ts";
+import { addTTLMessage, makeTTLMessageListener } from "#/lib/queues/mod.ts";
 import {
   DISCORD_CLIENT_ID,
   DISCORD_PUBLIC_KEY,
@@ -23,7 +20,7 @@ import {
   DISCORD_TOKEN,
   GITHUB_TOKEN,
   PORT,
-} from "shorter/env.ts";
+} from "#/env.ts";
 
 const INVITE_URL =
   `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&scope=applications.commands`;
