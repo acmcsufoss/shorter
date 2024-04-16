@@ -98,12 +98,6 @@ The GitHub personal access token. This is used to access the GitHub API via
 
 **Not required**. The port that the server will listen on.
 
-#### `DEV`
-
-**Not required**. If set to `true`, the server will spin up an Ngrok tunnel and
-print the URL to the console. This is intended for development. Paste this URL
-into the Discord application's Discord interactions endpoint URL.
-
 ---
 
 Programmed with ❤️ by [**@acmcsufoss**](https://oss.acmcsuf.com/).
