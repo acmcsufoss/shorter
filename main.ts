@@ -35,7 +35,7 @@ const discordAPI = new DiscordAPI({
 
 export const shorterSchema = {
   chatInput: {
-    name: "Shorter",
+    name: "shorter",
     description: "Manage shortlinks.",
     subcommands: {
       add: {

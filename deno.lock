@@ -55,7 +55,6 @@
     "https://deno.land/x/codemod@0.0.5/github/pr/github_update_pr_builder.ts": "a98fb814b3a32e51ee9192b4106d915bc41502cdf4714d2ed0f1858a6a46865a",
     "https://deno.land/x/codemod@0.0.5/github/pr/github_update_pr_builder_interface.ts": "d8645ecdc0796f04085045ddf8ad9bf9d2ba8ceebb0c74dc9d4e4b6ec7bc37d5",
     "https://deno.land/x/codemod@0.0.5/github/pr/mod.ts": "0ee439570efcca82f321fca5ac356aac847f3e202f5c8a57483fc647d7837de4",
-    "https://deno.land/x/codemod@0.0.5/github/shared/append.ts": "14fd7a3c056d569b6faa83f765b9fe66f97e2de470ed72f23906cc0ef609a069",
     "https://deno.land/x/codemod@0.0.5/github/shared/generate.ts": "a483aec1f47974846533dd903ea91b5d8a1e1a9b94a66148ecd85e095bab4f88",
     "https://deno.land/x/codemod@0.0.5/github/tree/base64.ts": "4854bba36ec3fc501693d27cece4f5725797b522cd7dfe0c721befedefd956f3",
     "https://deno.land/x/codemod@0.0.5/github/tree/github_create_tree_builder.ts": "cc3d4efa23ecce94eb1b3dbaf8cdd16dff3a14065335302365009df5a20a7c17",
@@ -64,8 +63,8 @@
     "https://deno.land/x/durationjs@v4.1.1/src/duration.ts": "dd82b556c311c83513b1e0e7184e27bacb7f1fa992518b56dfbdd69b7b79cb5b",
     "https://deno.land/x/durationjs@v4.1.1/src/in_words.ts": "1839490e2cb17fec2871bf87d6c7f7435c68416f9360d9f140777936d4680137",
     "https://deno.land/x/github_api_types@2023-05-17-05-41/mod.ts": "dc3a5cd3176c78085b49601e9c3fccac24809b037929230293255edabafbd0bb",
-    "https://esm.sh/fast-json-patch@3.1.1": "af46ff8943971c21b2722f5d715096f5b8eacea5174c463c2635d6d4e40351db",
-    "https://esm.sh/v135/fast-json-patch@3.1.1/denonext/fast-json-patch.mjs": "9007860190336aa381bde2411eb991d3d70fe378c0cc204f099d4fc9bd6b7619"
+    "https://esm.sh/fast-json-patch@3.1.1": "fd59bab1fabdb3e7e2ce8204aa92113dc451708797021fff6f96b8ff265faedf",
+    "https://esm.sh/v124/fast-json-patch@3.1.1/deno/fast-json-patch.mjs": "19183b256388e7af3ffb65022a634e00109c308fe79071cd550dd5ab1f0a571b"
   },
   "workspace": {
     "dependencies": [
