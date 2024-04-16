@@ -1,15 +1,17 @@
 import { Duration } from "durationjs";
-// TODO: Export all APIInteractionResponse types from api types.
-import type { APIInteractionResponseDeferredChannelMessageWithSource } from "@discord-applications/app";
+import type {
+  APIInteractionResponseDeferredChannelMessageWithSource,
+  AppSchema,
+} from "@discord-applications/app";
 import {
+  ApplicationCommandOptionType,
   createApp,
+  DiscordAPI,
   InteractionResponseType,
-  // TODO: Export all MessageFlags from api types.
   MessageFlags,
 } from "@discord-applications/app";
 import type { ShorterOptions } from "shorter/lib/shorter/mod.ts";
 import { shorter } from "shorter/lib/shorter/mod.ts";
-import { DiscordAPIClient } from "shorter/lib/discord/mod.ts";
 import {
   addTTLMessage,
   makeTTLMessageListener,
@@ -22,15 +24,59 @@ import {
   GITHUB_TOKEN,
   PORT,
 } from "shorter/env.ts";
-import { appSchema } from "./app_schema.ts";
 
 const INVITE_URL =
   `https://discord.com/api/oauth2/authorize?client_id=${DISCORD_CLIENT_ID}&scope=applications.commands`;
 const APPLICATION_URL =
   `https://discord.com/developers/applications/${DISCORD_CLIENT_ID}/bot`;
 
-// TODO: Implement editOriginalInteractionResponse in DiscordAPIClient.
-const discordAPI = new DiscordAPIClient();
+const discordAPI = new DiscordAPI({
+  applicationID: DISCORD_CLIENT_ID,
+  token: DISCORD_TOKEN,
+  publicKey: DISCORD_PUBLIC_KEY,
+});
+
+export const shorterSchema = {
+  chatInput: {
+    name: "Shorter",
+    description: "Manage shortlinks.",
+    subcommands: {
+      add: {
+        description: "Add a shortlink.",
+        options: {
+          alias: {
+            type: ApplicationCommandOptionType.String,
+            description: "The alias of the shortlink",
+            required: true,
+          },
+          destination: {
+            type: ApplicationCommandOptionType.String,
+            description: "The destination of the shortlink",
+            required: true,
+          },
+          force: {
+            type: ApplicationCommandOptionType.Boolean,
+            description: "Whether to overwrite an existing shortlink",
+          },
+          ttl: {
+            type: ApplicationCommandOptionType.String,
+            description: "The time-to-live of the shortlink",
+          },
+        },
+      },
+      remove: {
+        description: "Remove a shortlink.",
+        options: {
+          alias: {
+            type: ApplicationCommandOptionType.String,
+            description: "The alias of the shortlink",
+            required: true,
+          },
+        },
+      },
+    },
+  },
+} as const satisfies AppSchema;
 
 if (import.meta.main) {
   await main();
@@ -48,12 +94,13 @@ export async function main() {
   });
 
   // Create the Discord application.
-  const handleInteraction = await createApp(
+  const shorterApp = await createApp(
     {
+      schema: shorterSchema,
       applicationID: DISCORD_CLIENT_ID,
       publicKey: DISCORD_PUBLIC_KEY,
-      register: { token: DISCORD_TOKEN },
-      schema: appSchema,
+      token: DISCORD_TOKEN,
+      register: true,
     },
     {
       add(interaction) {
@@ -108,8 +155,6 @@ export async function main() {
 
             // Send the success message.
             await discordAPI.editOriginalInteractionResponse({
-              botID: DISCORD_CLIENT_ID,
-              botToken: DISCORD_TOKEN,
               interactionToken: interaction.token,
               content,
             });
@@ -131,8 +176,6 @@ export async function main() {
           .catch((error) => {
             if (error instanceof Error) {
               discordAPI.editOriginalInteractionResponse({
-                botID: DISCORD_CLIENT_ID,
-                botToken: DISCORD_TOKEN,
                 interactionToken: interaction.token,
                 content: `Error: ${error.message}`,
               });
@@ -155,9 +198,9 @@ export async function main() {
           !interaction.member.roles.some((role) => DISCORD_ROLE_ID === role)
         ) {
           return {
-            type: discord.InteractionResponseType.ChannelMessageWithSource,
+            type: InteractionResponseType.ChannelMessageWithSource,
             data: {
-              flags: discord.MessageFlags.Ephemeral,
+              flags: MessageFlags.Ephemeral,
               content: "You do not have permission to use this command.",
             },
           };
@@ -178,8 +221,6 @@ export async function main() {
           .then(async (result) => {
             // Send the success message.
             await discordAPI.editOriginalInteractionResponse({
-              botID: DISCORD_CLIENT_ID,
-              botToken: DISCORD_TOKEN,
               interactionToken: interaction.token,
               content:
                 `Removed \`${interaction.data.parsedOptions.alias}\` in commit [${result.message}](https://acmcsuf.com/code/commit/${result.sha}).`,
@@ -188,8 +229,6 @@ export async function main() {
           .catch((error) => {
             if (error instanceof Error) {
               discordAPI.editOriginalInteractionResponse({
-                botID: DISCORD_CLIENT_ID,
-                botToken: DISCORD_TOKEN,
                 interactionToken: interaction.token,
                 content: `Error: ${error.message}`,
               });
@@ -200,9 +239,8 @@ export async function main() {
 
         // Acknowledge the interaction.
         return {
-          type:
-            discord.InteractionResponseType.DeferredChannelMessageWithSource,
-        } satisfies discord.APIInteractionResponseDeferredChannelMessageWithSource;
+          type: InteractionResponseType.DeferredChannelMessageWithSource,
+        } satisfies APIInteractionResponseDeferredChannelMessageWithSource;
       },
     },
   );
@@ -219,7 +257,7 @@ export async function main() {
         console.log("Discord application information:", APPLICATION_URL);
       },
     },
-    handleInteraction,
+    shorterApp,
   );
 }
 

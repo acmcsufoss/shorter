@@ -4,7 +4,7 @@
     "ngrok": "ngrok http 8080"
   },
   "imports": {
-    "@discord-applications/app": "jsr:@discord-applications/app@^0.0.2",
+    "@discord-applications/app": "jsr:@discord-applications/app@^0.0.4",
     "codemod": "https://deno.land/x/codemod@0.0.5/github/mod.ts",
     "durationjs": "https://deno.land/x/durationjs@v4.1.1/mod.ts",
     "shorter/": "./",
