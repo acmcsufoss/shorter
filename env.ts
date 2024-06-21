@@ -41,7 +41,7 @@ if (!RAW_DISCORD_ROLE_ID) {
 /**
  * DISCORD_ROLE_ID is the Discord board role ID.
  */
-export const DISCORD_ROLE_ID = RAW_DISCORD_ROLE_ID;
+export const DISCORD_ROLE_ID = RAW_DISCORD_ROLE_ID.split(",");
 
 const RAW_GITHUB_TOKEN = Deno.env.get("GITHUB_TOKEN");
 if (!RAW_GITHUB_TOKEN) {
