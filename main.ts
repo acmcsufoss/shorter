@@ -106,7 +106,9 @@ export async function main() {
         }
 
         if (
-          !interaction.member.roles.some((role) => DISCORD_ROLE_ID === role)
+          !interaction.member.roles.some((role) =>
+            DISCORD_ROLE_ID.includes(role)
+          )
         ) {
           return {
             type: InteractionResponseType.ChannelMessageWithSource,
