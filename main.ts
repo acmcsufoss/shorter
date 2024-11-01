@@ -141,8 +141,11 @@ export async function main() {
               Duration.fromString(interaction.data.parsedOptions.ttl);
 
             // Compose the commit message.
+            const shortlinkText = `acmcsuf.com/${shorterOptions.data.alias}`;
+            const commitText = result.sha.slice(0, 7);
+            const commitURL = `https://acmcsuf.com/code/commit/${result.sha}`;
             let content =
-              `Created commit [${result.message}](https://acmcsuf.com/code/commit/${result.sha})!`;
+              `Created shortlink [${shortlinkText}](https://${shortlinkText}) in commit [\`${commitText}\`](${commitURL})!`;
             if (ttlDuration) {
               // Render to Discord timestamp format.
               // https://gist.github.com/LeviSnoot/d9147767abeef2f770e9ddcd91eb85aa
@@ -194,7 +197,8 @@ export async function main() {
         }
 
         if (
-          !interaction.member.roles.some((role) => DISCORD_ROLE_ID === role)
+          !interaction.member.roles
+            .some((role) => DISCORD_ROLE_ID.includes(role))
         ) {
           return {
             type: InteractionResponseType.ChannelMessageWithSource,
