@@ -124,7 +124,7 @@ function formatCommitMessage(options: ShorterOptions): string {
 /**
  * ACMCSUF_OWNER is the owner of the acmcsuf.com GitHub repository.
  */
-export const ACMCSUF_OWNER = "EthanThatOneKid";
+export const ACMCSUF_OWNER = "acmcsufoss";
 
 /**
  * ACMCSUF_REPO is the name of the acmcsuf.com GitHub repository.
